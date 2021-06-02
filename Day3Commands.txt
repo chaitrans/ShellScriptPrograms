@@ -1,0 +1,158 @@
+1.Data Analysis / manupulation(AWK)?
+Solu.i) print EmployeeName and TotalPay who has BasePAy grater than 10000
+cat data.csv | awk '{if($4>10000) print $2" : "$4}'
+echo "------------------------------"
+# ii) What is the aggregate otalPay of employees whoose jobtitle is CAPTAIN
+cat data.csv | awk '{if($3=="CAPTAIN")sum += $7}END{print "Aggregat Pay : "sum}'
+echo "------------------------------"
+# iii) Print JobTitle and OverTimepay who has Ovevrtime is between 7000 and 10000
+cat data.csv | awk '{if($5>7000 && $5<10000) print $3" "$5}'
+echo "------------------------------"
+# iv) Print average BasePay
+cat data.csv | awk '{sum += $4; cnt +=1}END {print sum/cnt}'
+
+
+
+2.Execute Hello & ls and check execution status.
+Solu. 
+     "hello" command not executed and its execution status is 127 .
+     "ls" command executed and its execution status is 0.
+      
+      
+
+3.Set environment usersecret="dH34xJaa23" if its already not set.
+Solu. export usersecret="dH34xJaa23"
+      echo $usersecret
+      env | grep usersecret
+
+
+
+4.Find the word "systemd' from all log files in the folder/var/log & print number of occurance.
+Solu. do
+	count=`grep -c 'systemd' $log`
+	if [ $count -gt 0 ]
+	then
+		echo $count
+	fi
+done
+
+
+
+5.Print last 4 frequently access urls count in sorted order from /var/log/httpd/access.log
+Solu.cat access.log | awk '{print $11}' | grep -v '"-"' | sort | uniq -c | sort -nr | head -4.
+
+
+
+6. Print list of last 4 frequently access unique urls at partucular hours from /var/log/httpd/access.log
+Solu.echo -e |cat access.log | awk '{print $4"["$11}' | sort | uniq -c | sort -r |head -4 | awk -F[ '{print $1  $2"--"$3}'.
+
+
+
+7.Print list of web response code count in the unique sorted at specific hours?
+Solu.echo -e |cat access.log | awk '{print $9}' | sort | uniq -c | sort -nr |head -4.
+
+
+
+8 Print list of 10 unique sorted client IP /var/log/httpd/access.log?
+Solu.cat access.log | awk '{if (NR!=1) {print substr($16, 2, length($16)-2)}}' | sort -nr | head -10.
+
+
+
+9.Chcek if a folder exists or not. iF it's not present, create it.
+Solu.if [ -d "myFolder" ]
+then
+	echo "folder already exists!!"
+else
+	mkdir myFolder
+	echo "$foldername created"
+fi 
+
+
+
+10.Get user info frm /etc/passwd and change ownership of users home directory.
+Solu.
+   paths=`cat /etc/passwd | awk -F: '{if($4 > 1000) print $7}'`
+   linecount=`echo "$paths" | wc -l`
+   for path in $paths
+   do
+	dircontent=`ls -l $path`
+	sudo chown $USER:$USER $path
+	echo -e "$path : $dircontent"
+  done
+
+
+
+11.Move Files from one folder to the respective folders.
+Solu. 
+if [ -f *.txt ]
+then
+	for file in `ls *.txt`;
+	do
+		foldername=`echo $file | awk -F . '{print $1}'`
+		mkdir $foldername;
+		mv $file $foldername;
+		echo "files moved";
+	done
+else
+	echo "No txt files available."
+fi
+
+
+
+12.Append current date to all log files name which has extension .log.1 from a folder.
+Solu.
+dte=`date +'%d%m%Y'`
+echo "$dte"
+for file in `ls *.log.1`;
+do
+	first=`echo $file | awk -F . '{print $1}'`		#access
+	second=`echo $file | awk -F . '{print $2}'`		#log
+	#third=`echo $file | awk -F . '{print $3}'`		#1
+	updatedFileName=`echo $first'-'$dte'.'$second`		#access-24052021.log
+	mv $file $updatedFileName
+	echo "$updatedFileName"
+done
+
+
+
+
+13.Archive the files from /var/log folder which have modified 7 days ago and move it to your backup folder.
+Solu.
+destination="C:\Users\tusha\Desktop\tusharTerminalCommands\linux-content\demo\var\log\backupFolder"
+for file in `find var/log -type f`
+do
+	cp $file $destination
+	echo "File Copied"
+done
+
+
+
+14.Create process list table displays.
+Solu.
+   ps -o pid,ppid,cmd,%mem,pcpu
+
+
+
+15.Find the diff btwn original file and the updated file.Apply changes to the original file.
+Solu.
+    if [ -d original-bkup ]
+then
+	cp ~/Desktop/tusharTerminalCommands/linux-content/demo/original/original.txt ~/Desktop/tusharTerminalCommands/linux-content/demo/original-bkup
+	mv ~/Desktop/tusharTerminalCommands/linux-content/demo/original-bkup/original.txt ~/Desktop/tusharTerminalCommands/linux-content/demo/original-bkup/original-bkup.txt
+else
+	mkdir original-bkup
+	cp ~/Desktop/tusharTerminalCommands/linux-content/demo/original/original.txt ~/Desktop/tusharTerminalCommands/linux-content/demo/original-bkup
+	mv ~/Desktop/tusharTerminalCommands/linux-content/demo/original-bkup/original.txt ~/Desktop/tusharTerminalCommands/linux-content/demo/original-bkup/original-bkup.txt
+fi
+difference=`diff ~/Desktop/tusharTerminalCommands/linux-content/demo/original/original.txt ~/Desktop/tusharTerminalCommands/linux-content/demo/updated/updated.txt`
+
+diffLength=${#difference}
+if [ $diffLength -gt 0 ]
+then
+	echo "Both files are different"
+	cp ~/Desktop/tusharTerminalCommands/linux-content/demo/original/original.txt ~/Desktop/tusharTerminalCommands/linux-content/demo/updated/updated.txt
+else
+	echo "No difference"
+fi
+
+
